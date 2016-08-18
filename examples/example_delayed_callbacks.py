@@ -1,8 +1,10 @@
 from rumps import *
 
+
 @clicked('Testing')
 def tester(sender):
     sender.state = not sender.state
+
 
 class SomeApp(rumps.App):
     def __init__(self):

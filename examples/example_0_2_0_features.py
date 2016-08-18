@@ -2,6 +2,7 @@ import rumps
 
 rumps.debug_mode(True)
 
+
 @rumps.clicked('Print Something')
 def print_something(_):
     rumps.alert(message='something', ok='YES!', cancel='NO!')

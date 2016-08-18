@@ -5,11 +5,14 @@ try:
 except ImportError:
     from urllib.request import urlretrieve
 
+
 def sayhello(sender):
     print('hello {}'.format(sender))
 
+
 def e(_):
     print('EEEEEEE')
+
 
 def adjust_f(sender):
     if adjust_f.huh:
@@ -25,6 +28,7 @@ def adjust_f(sender):
         del sender['ppp']
     adjust_f.huh = not adjust_f.huh
 adjust_f.huh = True
+
 
 def print_f(_):
     print(f)
@@ -52,20 +56,24 @@ app.menu = [
     None
 ]
 
+
 @clicked('update method')
 def dict_update(menu):
     print(menu)
     print(menu.setdefault('boo', MenuItem('boo',
                                           callback=lambda _: add_separator(menu))))  # lambda gets THIS menu not submenu
 
+
 def add_separator(menu):
     menu.add(separator)
+
 
 @clicked('C')
 def change_main_menu(_):
     print(app.menu)
     print('goodbye C')
     del app.menu['C']  # DELETE SELF!!!1
+
 
 @clicked('stuff')
 def stuff(sender):

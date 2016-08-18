@@ -1,5 +1,6 @@
-import rumps
 import time
+
+import rumps
 
 
 def timez():

@@ -22,5 +22,6 @@ __author__ = 'Jared Suttles'
 __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2015 Jared Suttles'
 
-from .rumps import (separator, debug_mode, alert, notification, application_support, timers, quit_application, timer,
-                    clicked, notifications, MenuItem, Timer, Window, App)
+from .rumps import (App, MenuItem, Timer, Window, alert, application_support,
+                    clicked, debug_mode, notification, notifications,
+                    quit_application, separator, timer, timers)

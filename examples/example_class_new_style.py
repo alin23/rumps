@@ -1,5 +1,6 @@
 import rumps
 
+
 class AwesomeStatusBarApp(rumps.App):
     @rumps.clicked("Preferences")
     def prefs(self, _):

@@ -1,5 +1,6 @@
-import rumps
 import time
+
+import rumps
 
 rumps.debug_mode(True)  # turn on command line logging information for development - default is off
 

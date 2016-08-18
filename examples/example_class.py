@@ -1,5 +1,6 @@
 import rumps
 
+
 class AwesomeStatusBarApp(rumps.App):
     def __init__(self):
         super(AwesomeStatusBarApp, self).__init__("Awesome App")

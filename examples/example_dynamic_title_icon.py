@@ -2,17 +2,21 @@ import rumps
 
 rumps.debug_mode(True)
 
+
 @rumps.clicked('Icon', 'On')
 def a(_):
     app.icon = 'test.png'
+
 
 @rumps.clicked('Icon', 'Off')
 def b(_):
     app.icon = None
 
+
 @rumps.clicked('Title', 'On')
 def c(_):
     app.title = 'Buzz'
+
 
 @rumps.clicked('Title', 'Off')
 def d(_):
