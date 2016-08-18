@@ -906,6 +906,9 @@ class NSApp(NSObject):
 
     _ns_to_py_and_callback = {}
 
+    def userNotificationCenter_shouldPresentNotification_(self, center, notification):
+        return True
+
     def userNotificationCenter_didActivateNotification_(self, notification_center, notification):
         notification_center.removeDeliveredNotification_(notification)
         data = dict(notification.userInfo())
