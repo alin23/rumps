@@ -126,7 +126,7 @@ def _default_user_notification_center():
         return notification_center
 
 
-def notification(title, subtitle, message, data=None, sound='NSUserNotificationDefaultSoundName'):
+def notification(title, subtitle, message, data=None, sound='NSUserNotificationDefaultSoundName', after=0):
     """Send a notification to Notification Center (OS X 10.8+). If running on a version of macOS that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
 
@@ -140,22 +140,30 @@ def notification(title, subtitle, message, data=None, sound='NSUserNotificationD
     :param data: will be passed to the application's "notification center" (see :func:`rumps.notifications`) when this
                  notification is clicked.
     :param sound: whether the notification should make a noise when it arrives.
+    :param after: number of seconds to postpone the notification
     """
+    after = max(after, 0)
+
     if not _NOTIFICATIONS:
         raise RuntimeError('OS X 10.8+ is required to send notifications')
     if data is not None and not isinstance(data, Mapping):
         raise TypeError('notification data must be a mapping')
+
     _require_string_or_none(title, subtitle, message)
     notification = NSUserNotification.alloc().init()
     notification.setTitle_(title)
     notification.setSubtitle_(subtitle)
     notification.setInformativeText_(message)
     notification.setUserInfo_({} if data is None else data)
+
     if sound:
         notification.setSoundName_(sound)
-    notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
-    notification_center = _default_user_notification_center()
-    notification_center.scheduleNotification_(notification)
+
+    if after:
+        notification.setDeliveryDate_(NSDate.dateWithTimeIntervalSinceNow_(after))
+        NSUserNotificationCenter.defaultUserNotificationCenter().scheduleNotification_(notification)
+    else:
+        NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification_(notification)
 
 
 def application_support(name):
