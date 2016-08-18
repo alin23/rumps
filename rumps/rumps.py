@@ -126,7 +126,7 @@ def _default_user_notification_center():
         return notification_center
 
 
-def notification(title, subtitle, message, data=None, sound=True):
+def notification(title, subtitle, message, data=None, sound='NSUserNotificationDefaultSoundName'):
     """Send a notification to Notification Center (OS X 10.8+). If running on a version of macOS that does not
     support notifications, a ``RuntimeError`` will be raised. Apple says,
 
@@ -152,7 +152,7 @@ def notification(title, subtitle, message, data=None, sound=True):
     notification.setInformativeText_(message)
     notification.setUserInfo_({} if data is None else data)
     if sound:
-        notification.setSoundName_("NSUserNotificationDefaultSoundName")
+        notification.setSoundName_(sound)
     notification.setDeliveryDate_(NSDate.dateWithTimeInterval_sinceDate_(0, NSDate.date()))
     notification_center = _default_user_notification_center()
     notification_center.scheduleNotification_(notification)
