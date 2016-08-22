@@ -36,12 +36,14 @@ from Foundation import (
     NSDefaultRunLoopMode,
     NSSearchPathForDirectoriesInDomains
 )
+from notifier import RumpsNotifier
 from PyObjCTools import AppHelper
 
 from .utils import ListDict
 from .compat import iteritems, text_type, string_types
 
 _TIMERS = weakref.WeakKeyDictionary()
+Notifier = RumpsNotifier()
 separator = object()
 
 
@@ -141,46 +143,6 @@ def _default_user_notification_center():
         return notification_center
 
 
-def notification(title, subtitle, message, data=None, sound='NSUserNotificationDefaultSoundName', after=0):
-    """Send a notification to Notification Center (OS X 10.8+). If running on a version of macOS that does not
-    support notifications, a ``RuntimeError`` will be raised. Apple says,
-
-        "The userInfo content must be of reasonable serialized size (less than 1k) or an exception will be thrown."
-
-    So don't do that!
-
-    :param title: text in a larger font.
-    :param subtitle: text in a smaller font below the `title`.
-    :param message: text representing the body of the notification below the `subtitle`.
-    :param data: will be passed to the application's "notification center" (see :func:`rumps.notifications`) when this
-                 notification is clicked.
-    :param sound: whether the notification should make a noise when it arrives.
-    :param after: number of seconds to postpone the notification
-    """
-    after = max(after, 0)
-
-    if not _NOTIFICATIONS:
-        raise RuntimeError('OS X 10.8+ is required to send notifications')
-    if data is not None and not isinstance(data, Mapping):
-        raise TypeError('notification data must be a mapping')
-
-    _require_string_or_none(title, subtitle, message)
-    notification = NSUserNotification.alloc().init()
-    notification.setTitle_(title)
-    notification.setSubtitle_(subtitle)
-    notification.setInformativeText_(message)
-    notification.setUserInfo_({} if data is None else data)
-
-    if sound:
-        notification.setSoundName_(sound)
-
-    if after:
-        notification.setDeliveryDate_(NSDate.dateWithTimeIntervalSinceNow_(after))
-        NSUserNotificationCenter.defaultUserNotificationCenter().scheduleNotification_(notification)
-    else:
-        NSUserNotificationCenter.defaultUserNotificationCenter().deliverNotification_(notification)
-
-
 def application_support(name):
     """Return the application support folder path for the given `name`, creating it if it doesn't exist."""
     app_support_path = os.path.join(NSSearchPathForDirectoriesInDomains(14, 1, 1).objectAtIndex_(0), name)
@@ -196,6 +158,10 @@ def timers():
 
 def quit_application(sender=None):
     """Quit the application. Some menu item should call this function so that the application can exit gracefully."""
+    if _NOTIFICATIONS:
+        Notifier.removeAllScheduledNotifications()
+        Notifier.removeAllDeliveredNotifications()
+
     nsapplication = NSApplication.sharedApplication()
     _log('closing application')
     nsapplication.terminate_(sender)
@@ -299,23 +265,6 @@ def clicked(*args, **options):
 
         return f
     return decorator
-
-
-def notifications(f):
-    """Decorator for registering a function to serve as a "notification center" for the application. This function will
-    receive the data associated with an incoming macOS notification sent using :func:`rumps.notification`. This occurs
-    whenever the user clicks on a notification for this application in the macOS Notification Center.
-
-    .. code-block:: python
-
-        @rumps.notifications
-        def notification_center(info):
-            if 'unix' in info:
-                print 'i know this'
-
-    """
-    notifications.__dict__['*notification_center'] = f
-    return f
 
 
 def _call_as_function_or_method(func, event):
@@ -938,7 +887,7 @@ class NSApp(NSObject):
         notification_center.removeDeliveredNotification_(notification)
         data = dict(notification.userInfo())
         try:
-            notification_function = getattr(notifications, '*notification_center')
+            notification_function = getattr(Notifier, '*notification_center')
         except AttributeError:  # notification center function not specified -> no error but warning in log
             _log('WARNING: notification received but no function specified for answering it; use @notifications '
                  'decorator to register a function.')

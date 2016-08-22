@@ -23,5 +23,5 @@ __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2015 Jared Suttles'
 
 from .rumps import (App, MenuItem, Timer, Window, alert, application_support,
-                    clicked, debug_mode, notification, notifications,
+                    clicked, debug_mode, Notifier,
                     quit_application, separator, timer, timers)
